@@ -25,7 +25,52 @@ namespace CRUDCORE.Controllers
         public IActionResult Guardar(ContactoModelo oContacto)
         {
             //Recibe un objeto para poder guardarlo en la BD
+
+            if (!ModelState.IsValid) 
+            {
+                return View();
+            }
             var answer = _ContactoDatos.Guardar(oContacto);
+
+            if (answer) return RedirectToAction("Listar");
+            else return View();
+        }
+
+        public IActionResult Editar(int IdContacto)
+        {
+            //Abre la vista de guardar
+            var oContacto = _ContactoDatos.Obtener(IdContacto);
+            return View(oContacto);
+        }
+
+        [HttpPost]
+        public IActionResult Editar(ContactoModelo oContacto)
+        {
+            //Recibe un objeto para poder guardarlo en la BD
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            var answer = _ContactoDatos.Editar(oContacto);
+
+            if (answer) return RedirectToAction("Listar");
+            else return View();
+        }
+
+        public IActionResult Eliminar(int IdContacto)
+        {
+            //Abre la vista de eliminar
+            var oContacto = _ContactoDatos.Obtener(IdContacto);
+            return View(oContacto);
+        }
+
+        [HttpPost]
+        public IActionResult Eliminar(ContactoModelo oContacto)
+        {
+            //Recibe un objeto para poder eliminarlo en la BD
+
+            var answer = _ContactoDatos.Eliminar(oContacto.IdContacto);
 
             if (answer) return RedirectToAction("Listar");
             else return View();

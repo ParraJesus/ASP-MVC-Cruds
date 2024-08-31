@@ -1,6 +1,7 @@
 ﻿using CRUDCORE.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CRUDCORE.Data
@@ -42,35 +43,30 @@ namespace CRUDCORE.Data
         public ContactoModelo Obtener(int IdContacto)
         {
             var oContacto = new ContactoModelo();
+
             var cn = new Conexion();
 
             using (var conexion = new MySqlConnection(cn.GetCadenaSQL()))
             {
                 conexion.Open();
+                MySqlCommand cmd = new MySqlCommand("sp_Obtener", conexion);
+                cmd.Parameters.AddWithValue("p_IdContacto", IdContacto);
+                cmd.CommandType = CommandType.StoredProcedure;
 
-                using (MySqlCommand cmd = new MySqlCommand("sp_Obtener", conexion))
+                using (var dr = cmd.ExecuteReader())
                 {
 
-                    cmd.Parameters.AddWithValue("IdContacto", IdContacto);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    using (var reader = cmd.ExecuteReader())
+                    while (dr.Read())
                     {
-                        while (reader.Read())
-                        {
-                            new ContactoModelo()
-                            {
-                                IdContacto = Convert.ToInt32(reader["IdContacto"]),
-                                Nombre = reader["Nombre"].ToString(),
-                                Telefono = reader["Telefono"].ToString(),
-                                Correo = reader["Correo"].ToString()
-                            };
-                        }
+                        oContacto.IdContacto = Convert.ToInt32(dr["IdContacto"]);
+                        oContacto.Nombre = dr["Nombre"].ToString();
+                        oContacto.Telefono = dr["Telefono"].ToString();
+                        oContacto.Correo = dr["Correo"].ToString();
                     }
                 }
-            }
 
-            return oContacto;
+                return oContacto;
+            }
         }
 
         public bool Guardar(ContactoModelo oContacto) 
@@ -115,11 +111,11 @@ namespace CRUDCORE.Data
                 using (var conexion = new MySqlConnection(cn.GetCadenaSQL()))
                 {
                     conexion.Open();
-                    MySqlCommand cmd = new MySqlCommand("sp_Editar");
-                    cmd.Parameters.AddWithValue("IdContacto", oContacto.IdContacto);
-                    cmd.Parameters.AddWithValue("Nombre", oContacto.Nombre);
-                    cmd.Parameters.AddWithValue("Telefono", oContacto.Telefono);
-                    cmd.Parameters.AddWithValue("Correo", oContacto.Correo);
+                    MySqlCommand cmd = new MySqlCommand("sp_Editar",conexion);
+                    cmd.Parameters.AddWithValue("p_IdContacto", oContacto.IdContacto);
+                    cmd.Parameters.AddWithValue("p_Nombre", oContacto.Nombre);
+                    cmd.Parameters.AddWithValue("p_Telefono", oContacto.Telefono);
+                    cmd.Parameters.AddWithValue("p_Correo", oContacto.Correo);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.ExecuteNonQuery();
                 }
@@ -145,8 +141,8 @@ namespace CRUDCORE.Data
                 using (var conexion = new MySqlConnection(cn.GetCadenaSQL()))
                 {
                     conexion.Open();
-                    MySqlCommand cmd = new MySqlCommand("sp_Eliminar");
-                    cmd.Parameters.AddWithValue("IdContacto", IdContacto);
+                    MySqlCommand cmd = new MySqlCommand("sp_Eliminar", conexion);
+                    cmd.Parameters.AddWithValue("p_IdContacto", IdContacto);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.ExecuteNonQuery();
                 }

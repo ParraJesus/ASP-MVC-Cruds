@@ -16,9 +16,9 @@ DELIMITER ;
 
 -- Crear el procedimiento almacenado para obtener un contacto por IdContacto
 DELIMITER //
-CREATE PROCEDURE sp_Obtener(IN IdContacto INT)
+CREATE PROCEDURE sp_Obtener(IN p_IdContacto INT)
 BEGIN
-    SELECT * FROM CONTACTO WHERE IdContacto = IdContacto;
+    SELECT * FROM CONTACTO WHERE IdContacto = p_IdContacto;
 END //
 DELIMITER ;
 
@@ -52,11 +52,12 @@ DELIMITER ;
 
 -- Crear el procedimiento almacenado para eliminar un contacto
 DELIMITER //
-CREATE PROCEDURE sp_Eliminar(IN IdContacto INT)
+CREATE PROCEDURE sp_Eliminar(IN p_IdContacto INT)
 BEGIN
-    DELETE FROM CONTACTO WHERE IdContacto = IdContacto;
+    DELETE FROM CONTACTO WHERE IdContacto = p_IdContacto;
 END //
 DELIMITER ;
 
+
+call sp_Eliminar(3);
 select * from contacto;
-SELECT USER(), CURRENT_USER();
